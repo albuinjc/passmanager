@@ -9,7 +9,9 @@ export default async function DashboardLayout({
     children: React.ReactNode
 }) {
     const isDemo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
-    let userRole = "Viewer" 
+    let userRole = "Viewer"
+    let userName = ""
+    let userEmail = ""
 
     if (isDemo) {
         userRole = MOCK_PROFILE.role || "Viewer"
@@ -23,12 +25,14 @@ export default async function DashboardLayout({
 
         const { data: profile } = await supabase
             .from("profiles")
-            .select("role")
+            .select("role, name, email")
             .eq("id", user.id)
             .single()
 
         if (profile) {
             userRole = profile.role
+            userName = profile.name
+            userEmail = profile.email
         }
     }
 
@@ -36,7 +40,7 @@ export default async function DashboardLayout({
         <div className="flex min-h-screen">
             {/* Sidebar for desktop */}
             <div className="hidden md:flex w-64 flex-col fixed inset-y-0 z-50">
-                <Sidebar className="h-full" userRole={userRole} />
+                <Sidebar className="h-full" userRole={userRole} userName={userName} userEmail={userEmail} />
             </div>
 
             {/* Main Content */}

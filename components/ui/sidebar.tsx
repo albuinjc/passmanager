@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area" 
+import { ScrollArea } from "@/components/ui/scroll-area"
 import {
     LayoutDashboard,
     Key,
@@ -17,11 +17,15 @@ import {
     ShieldCheck
 } from "lucide-react"
 
+import { signout } from "@/app/auth/actions"
+
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
     userRole?: string
+    userName?: string
+    userEmail?: string
 }
 
-export function Sidebar({ className, userRole }: SidebarProps) {
+export function Sidebar({ className, userRole, userName, userEmail }: SidebarProps) {
     const pathname = usePathname()
 
     const items = [
@@ -62,6 +66,14 @@ export function Sidebar({ className, userRole }: SidebarProps) {
             ],
         },
     ]
+
+    const handleSignOut = async () => {
+        try {
+            await fetch("/auth/signout", { method: "POST" })
+        } catch (error) {
+            console.error("Error signing out:", error)
+        }
+    }
 
     return (
         <div className={cn("pb-12 h-screen border-r bg-background", className)}>
@@ -104,15 +116,17 @@ export function Sidebar({ className, userRole }: SidebarProps) {
                 <div className="mt-auto px-4 py-4 border-t">
                     <div className="flex items-center gap-3">
                         <div className="h-9 w-9 rounded-full bg-slate-200 flex items-center justify-center">
-                            <span className="text-sm font-medium">JD</span>
+                            <span className="text-sm font-medium">{userName ? userName.substring(0, 2).toUpperCase() : "JD"}</span>
                         </div>
                         <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium truncate">John Doe</p>
-                            <p className="text-xs text-muted-foreground truncate">john@example.com</p>
+                            <p className="text-sm font-medium truncate">{userName}</p>
+                            <p className="text-xs text-muted-foreground truncate">{userEmail}</p>
                         </div>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <LogOut className="h-4 w-4 text-muted-foreground" />
-                        </Button>
+                        <form action={signout}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8" type="submit">
+                                <LogOut className="h-4 w-4 text-muted-foreground" />
+                            </Button>
+                        </form>
                     </div>
                 </div>
             </div>
