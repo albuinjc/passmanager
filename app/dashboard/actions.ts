@@ -1,0 +1,274 @@
+"use server"
+
+import { createClient } from "@/lib/supabase-server"
+import { credentialSchema, shareSchema } from "@/lib/schemas"
+import { revalidatePath } from "next/cache"
+import { redirect } from "next/navigation"
+import { MOCK_PROFILE, MOCK_USERS, MOCK_SHARED_CREDENTIALS, MOCK_CREDENTIALS } from "@/lib/mock-data"
+
+const isDemo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
+
+
+async function getUserRole(supabase: any, userId: string) {
+    if (isDemo) return MOCK_PROFILE.role || "Viewer"
+    const { data } = await supabase.from("profiles").select("role").eq("id", userId).single()
+    return data?.role || "Viewer"
+}
+
+export async function createCredential(formData: FormData) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user && !isDemo) {
+        throw new Error("Unauthorized")
+    }
+
+    const userId = user?.id || MOCK_PROFILE.id
+    const role = await getUserRole(supabase, userId)
+
+    if (role === "Viewer") {
+        return { error: "Viewers cannot create credentials" }
+    }
+
+    const rawData = {
+        title: formData.get("title"),
+        username: formData.get("username"),
+        password: formData.get("password"),
+        url: formData.get("url"),
+        description: formData.get("description"),
+        two_fa_seed: formData.get("two_fa_seed"),
+    }
+
+    const validatedFields = credentialSchema.safeParse(rawData)
+
+    if (!validatedFields.success) {
+        return { error: validatedFields.error.flatten().fieldErrors }
+    }
+
+    if (isDemo) {
+        console.log("Mock Create Credential:", rawData)
+        revalidatePath("/dashboard")
+        return { success: true }
+    }
+
+    const { error } = await supabase
+        .from("credentials")
+        .insert({
+            ...validatedFields.data,
+            created_by: user!.id,
+        })
+
+    if (error) {
+        return { error: error.message }
+    }
+
+    revalidatePath("/dashboard")
+    return { success: true }
+}
+
+export async function updateCredential(id: string, formData: FormData) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user && !isDemo) throw new Error("Unauthorized")
+
+    const userId = user?.id || MOCK_PROFILE.id
+    const role = await getUserRole(supabase, userId)
+
+    
+    if (role === "Viewer") {
+        return { error: "Viewers cannot edit credentials" }
+    }
+
+    
+    if (role === "Editor") {
+        
+        let isOwner = false
+        let isShared = false
+
+        if (isDemo) {
+            isOwner = MOCK_CREDENTIALS.some(c => c.id === id)
+            isShared = MOCK_SHARED_CREDENTIALS.some(c => c.id === id)
+        } else {
+            const { data: cred } = await supabase.from("credentials").select("created_by").eq("id", id).single()
+            if (cred?.created_by === userId) isOwner = true
+
+            if (!isOwner) {
+                const { data: share } = await supabase.from("credential_shares").select("id").eq("credential_id", id).eq("shared_with", userId).single()
+                if (share) isShared = true
+            }
+        }
+
+        if (!isOwner && !isShared) {
+            return { error: "You do not have permission to edit this credential" }
+        }
+    }
+
+    const rawData = {
+        title: formData.get("title"),
+        username: formData.get("username"),
+        password: formData.get("password"),
+        url: formData.get("url"),
+        description: formData.get("description"),
+        two_fa_seed: formData.get("two_fa_seed"),
+    }
+
+    const validatedFields = credentialSchema.safeParse(rawData)
+
+    if (!validatedFields.success) {
+        return { error: validatedFields.error.flatten().fieldErrors }
+    }
+
+    if (isDemo) {
+        console.log("Mock Update Credential:", id, rawData)
+        revalidatePath("/dashboard")
+        return { success: true }
+    }
+
+    const { error } = await supabase
+        .from("credentials")
+        .update(validatedFields.data)
+        .eq("id", id)
+
+    if (error) {
+        return { error: error.message }
+    }
+
+    revalidatePath("/dashboard")
+    return { success: true }
+}
+
+export async function deleteCredential(id: string) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user && !isDemo) throw new Error("Unauthorized")
+
+    const userId = user?.id || MOCK_PROFILE.id
+    const role = await getUserRole(supabase, userId)
+
+    if (role === "Viewer") {
+        return { error: "Viewers cannot delete credentials" }
+    }
+
+    if (role === "Editor") {
+        
+        let isOwner = false
+        if (isDemo) {
+            isOwner = MOCK_CREDENTIALS.some(c => c.id === id)
+        } else {
+            const { data: cred } = await supabase.from("credentials").select("created_by").eq("id", id).single()
+            if (cred?.created_by === userId) isOwner = true
+        }
+
+        if (!isOwner) {
+            return { error: "You can only delete your own credentials" }
+        }
+    }
+
+    if (isDemo) {
+        console.log("Mock Delete Credential:", id)
+        revalidatePath("/dashboard")
+        return { success: true }
+    }
+
+    const { error } = await supabase
+        .from("credentials")
+        .delete()
+        .eq("id", id)
+
+    if (error) {
+        return { error: error.message }
+    }
+
+    revalidatePath("/dashboard")
+    return { success: true }
+}
+
+export async function searchUsers(query: string) {
+    if (isDemo) {
+        if (!query || query.length < 2) return []
+        return MOCK_USERS.filter(u =>
+            u.email.toLowerCase().includes(query.toLowerCase()) ||
+            u.name.toLowerCase().includes(query.toLowerCase())
+        ).map(u => ({ id: u.id, email: u.email, name: u.name }))
+    }
+
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return []
+
+    
+    
+    
+
+    const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single()
+    if (profile?.role === "Viewer") return []
+
+    if (!query || query.length < 2) return []
+
+    const { data, error } = await supabase
+        .from("profiles")
+        .select("id, email, name")
+        .ilike("email", `%${query}%`)
+        .neq("id", user.id) 
+        .limit(5)
+
+    if (error) {
+        console.error("Search users error:", error)
+        return []
+    }
+
+    return data || []
+}
+
+export async function shareCredential(credentialId: string, emails: string[]) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user && !isDemo) throw new Error("Unauthorized")
+
+    const userId = user?.id || MOCK_PROFILE.id
+    const role = await getUserRole(supabase, userId)
+
+    if (role === "Viewer") {
+        return { error: "Viewers cannot share credentials" }
+    }
+
+    if (isDemo) {
+        console.log(`Mock Share Credential ${credentialId} with:`, emails)
+        revalidatePath("/dashboard")
+        return { success: true }
+    }
+
+    if (!emails || emails.length === 0) return { error: "No users selected" }
+
+    
+    const { data: profiles, error: profileError } = await supabase
+        .from("profiles")
+        .select("id, email")
+        .in("email", emails)
+
+    if (profileError || !profiles || profiles.length === 0) {
+        return { error: "Users not found" }
+    }
+
+    
+    const inserts = profiles.map(profile => ({
+        credential_id: credentialId,
+        shared_with: profile.id,
+        shared_by: user!.id
+    }))
+
+    const { error } = await supabase
+        .from("credential_shares")
+        .insert(inserts)
+
+    if (error) {
+        if (error.code === '23505') return { error: "Credential already shared with some of these users" }
+        return { error: error.message }
+    }
+
+    revalidatePath("/dashboard")
+    return { success: true }
+}
