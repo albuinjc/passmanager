@@ -66,7 +66,9 @@ export async function createUser(data: z.infer<typeof userSchema>) {
             .from("profiles")
             .update({
                 role: data.role,
-                active: data.active
+                active: data.active,
+                name: data.name,
+                description: data.description
             })
             .eq("id", userData.user.id)
 
@@ -100,21 +102,33 @@ export async function updateUser(id: string, data: Partial<z.infer<typeof userSc
         return { success: true, message: "User updated (Demo Mode)" }
     }
 
-    const updates: any = {}
-    if (data.role) updates.role = data.role
-    if (data.active !== undefined) updates.active = data.active
+    try {
+        const serviceClient = createServiceClient()
 
-    if (Object.keys(updates).length === 0) return { success: true }
+        const updates: any = {}
+        if (data.role) updates.role = data.role
+        if (data.active !== undefined) updates.active = data.active
+        if (data.name !== undefined) updates.name = data.name
+        if (data.description !== undefined) updates.description = data.description
 
-    const { error } = await supabase
-        .from("profiles")
-        .update(updates)
-        .eq("id", id)
+        if (Object.keys(updates).length === 0) return { success: true }
 
-    if (error) return { error: error.message }
+        const { error } = await serviceClient
+            .from("profiles")
+            .update(updates)
+            .eq("id", id)
 
-    revalidatePath("/dashboard/settings")
-    return { success: true }
+        if (error) {
+            console.error("Error updating user:", error)
+            return { error: error.message }
+        }
+
+        revalidatePath("/dashboard/settings")
+        return { success: true, message: "User updated successfully" }
+    } catch (error: any) {
+        console.error("Unexpected error in updateUser:", error)
+        return { error: error.message || "An unexpected error occurred" }
+    }
 }
 
 export async function deleteUser(id: string) {
