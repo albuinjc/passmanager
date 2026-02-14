@@ -43,13 +43,11 @@ export default function LoginPage() {
                             <Input id="password" name="password" type="password" required />
                         </div>
                     </CardContent>
-                    <CardFooter className="flex flex-col space-y-2">
+                    <CardFooter className="flex flex-col space-y-2 pt-6">
                         <Button className="w-full" type="submit" disabled={loading}>
                             {loading ? "Signing in..." : "Sign in"}
                         </Button>
-                        <p className="text-xs text-center text-muted-foreground">
-                            Don't have an account? <Link href="/register" className="text-primary hover:underline">Sign up</Link>
-                        </p>
+
                     </CardFooter>
                 </form>
             </Card>
