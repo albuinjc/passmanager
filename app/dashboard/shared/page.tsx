@@ -30,30 +30,30 @@ export default async function SharedPage() {
             .single()
         profile = profileData
 
-        
-        
-        
-        
+
+
+
+
         const { data: shares, error: fetchError } = await supabase
             .from('credential_shares')
             .select(`
                  credential:credentials (*)
              `)
-            .eq('user_email', user.email) 
-        
-        
-        
-        
+            .eq('user_email', user.email)
 
-        
-        
 
-        
-        
+
+
+
+
+
+
+
+
         const { data: creds, error: credError } = await supabase
             .from("credentials")
-            .select("*, credential_shares!inner(user_id)") 
-            .eq("credential_shares.user_id", user.id)
+            .select("*, credential_shares!inner(shared_with)")
+            .eq("credential_shares.shared_with", user.id)
 
         credentials = creds
         error = credError
