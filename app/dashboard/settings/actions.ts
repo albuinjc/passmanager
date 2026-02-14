@@ -1,6 +1,7 @@
 "use server"
 
 import { createClient } from "@/lib/supabase-server"
+import { createServiceClient } from "@/lib/supabase-admin"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 import { userSchema } from "@/lib/schemas"
@@ -20,7 +21,7 @@ export async function createUser(data: z.infer<typeof userSchema>) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
-    
+
     const requestorId = user?.id || MOCK_PROFILE.id
     const role = await getUserRole(supabase, requestorId)
 
@@ -40,9 +41,46 @@ export async function createUser(data: z.infer<typeof userSchema>) {
         return { success: true, message: "User created (Demo Mode)" }
     }
 
-    
-    
-    return { error: "User creation not fully implemented in Real Mode (requires Service Role)" }
+    try {
+        const serviceClient = createServiceClient()
+
+        const { data: userData, error: createError } = await serviceClient.auth.admin.createUser({
+            email: data.email,
+            password: data.password,
+            email_confirm: true,
+            user_metadata: {
+                full_name: data.name
+            }
+        })
+
+        if (createError) {
+            console.error("Error creating user:", createError)
+            return { error: createError.message }
+        }
+
+        if (!userData.user) {
+            return { error: "Failed to create user" }
+        }
+
+        const { error: updateError } = await serviceClient
+            .from("profiles")
+            .update({
+                role: data.role,
+                active: data.active
+            })
+            .eq("id", userData.user.id)
+
+        if (updateError) {
+            console.error("Error updating profile:", updateError)
+            return { error: "User created but profile update failed: " + updateError.message }
+        }
+
+        revalidatePath("/dashboard/settings")
+        return { success: true, message: "User created successfully" }
+    } catch (error: any) {
+        console.error("Unexpected error in createUser:", error)
+        return { error: error.message || "An unexpected error occurred" }
+    }
 }
 
 export async function updateUser(id: string, data: Partial<z.infer<typeof userSchema>>) {
@@ -96,5 +134,20 @@ export async function deleteUser(id: string) {
         return { success: true, message: "User deleted (Demo Mode)" }
     }
 
-    return { error: "Delete not implemented (requires Service Role)" }
+    try {
+        const serviceClient = createServiceClient()
+
+        const { error: deleteError } = await serviceClient.auth.admin.deleteUser(id)
+
+        if (deleteError) {
+            console.error("Error deleting user:", deleteError)
+            return { error: deleteError.message }
+        }
+
+        revalidatePath("/dashboard/settings")
+        return { success: true, message: "User deleted successfully" }
+    } catch (error: any) {
+        console.error("Unexpected error in deleteUser:", error)
+        return { error: error.message || "An unexpected error occurred" }
+    }
 }
