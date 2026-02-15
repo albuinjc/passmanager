@@ -83,6 +83,24 @@ export function CredentialForm({ credentialToEdit, open, onOpenChange }: Credent
 
 
     const onSubmit = async (data: CredentialFormValues) => {
+        if (data.two_fa_seed) {
+            try {
+                // Try to generate a token to validate the seed
+                const { validateTotpSeed } = await import("@/lib/totp-utils")
+                const isValid = await validateTotpSeed(data.two_fa_seed)
+
+                if (!isValid) {
+                    throw new Error("Invalid seed")
+                }
+            } catch (e) {
+                form.setError("two_fa_seed", {
+                    type: "manual",
+                    message: "Invalid TOTP Seed (must be valid Base32)"
+                })
+                return
+            }
+        }
+
         setLoading(true)
         try {
             const formData = new FormData()
@@ -98,7 +116,6 @@ export function CredentialForm({ credentialToEdit, open, onOpenChange }: Credent
             }
 
             if (result && 'error' in result) {
-
                 toast.error("Error saving credential")
                 console.error(result.error)
             } else {

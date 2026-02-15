@@ -36,7 +36,7 @@ export async function createCredential(formData: FormData) {
         password: formData.get("password") as string,
         url: (formData.get("url") as string) || undefined,
         description: (formData.get("description") as string) || undefined,
-        two_fa_seed: (formData.get("two_fa_seed") as string) || undefined,
+        two_fa_seed: (formData.get("two_fa_seed") as string) || "",
     }
 
     const validatedFields = credentialSchema.safeParse(rawData)
@@ -110,7 +110,7 @@ export async function updateCredential(id: string, formData: FormData) {
         password: formData.get("password") as string,
         url: (formData.get("url") as string) || undefined,
         description: (formData.get("description") as string) || undefined,
-        two_fa_seed: (formData.get("two_fa_seed") as string) || undefined,
+        two_fa_seed: (formData.get("two_fa_seed") as string) || "",
     }
 
     const validatedFields = credentialSchema.safeParse(rawData)
