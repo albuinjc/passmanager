@@ -41,6 +41,10 @@ export default async function CredentialsPage() {
             .single()
         profile = profileData
 
+        if (profile?.role === 'Viewer') {
+            redirect("/dashboard")
+        }
+
         let query = supabase
             .from("credentials")
             .select("*, credential_shares(shared_with)")

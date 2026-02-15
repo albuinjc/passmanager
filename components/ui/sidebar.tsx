@@ -41,11 +41,13 @@ export function Sidebar({ className, userRole, userName, userEmail }: SidebarPro
                     title: "Credentials",
                     href: "/dashboard/credentials",
                     icon: Key,
+                    hidden: userRole === 'Viewer',
                 },
                 {
                     title: "Shared",
                     href: "/dashboard/shared",
                     icon: Share2,
+                    hidden: userRole === 'Viewer',
                 },
             ],
         },
