@@ -86,6 +86,7 @@ export async function createUser(data: z.infer<typeof userSchema>) {
 }
 
 export async function updateUser(id: string, data: Partial<z.infer<typeof userSchema>>) {
+    console.log("updateUser called with:", { id, dataKeys: Object.keys(data), hasPassword: !!data.password })
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
