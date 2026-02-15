@@ -237,8 +237,8 @@ export async function shareCredential(credentialId: string, emails: string[]) {
 
     if (!emails || emails.length === 0) return { error: "No users selected" }
 
-
-    const { data: profiles, error: profileError } = await supabase
+    const adminSupabase = createServiceClient()
+    const { data: profiles, error: profileError } = await adminSupabase
         .from("profiles")
         .select("id, email")
         .in("email", emails)
