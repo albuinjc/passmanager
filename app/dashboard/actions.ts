@@ -196,18 +196,12 @@ export async function searchUsers(query: string) {
 
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
+
     if (!user) return []
 
+    const adminSupabase = createServiceClient()
 
-
-
-
-    const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single()
-    if (profile?.role === "Viewer") return []
-
-    if (!query || query.length < 2) return []
-
-    const { data, error } = await supabase
+    const { data, error } = await adminSupabase
         .from("profiles")
         .select("id, email, name")
         .ilike("email", `%${query}%`)
@@ -281,7 +275,8 @@ export async function getCredentialShares(credentialId: string) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user && !isDemo) return []
 
-    const role = await getUserRole(supabase, user!.id)
+    const userId = user?.id || MOCK_PROFILE.id
+    const role = await getUserRole(supabase, userId)
 
     let hasAccess = false
 
@@ -294,14 +289,14 @@ export async function getCredentialShares(credentialId: string) {
             .eq("id", credentialId)
             .single()
 
-        if (credential?.created_by === user!.id) {
+        if (credential?.created_by === userId) {
             hasAccess = true
         } else {
             const { data: myShare } = await supabase
                 .from("credential_shares")
                 .select("id")
                 .eq("credential_id", credentialId)
-                .eq("shared_with", user!.id)
+                .eq("shared_with", userId)
                 .single()
 
             if (myShare) hasAccess = true
@@ -309,6 +304,15 @@ export async function getCredentialShares(credentialId: string) {
     }
 
     if (!hasAccess && !isDemo) return []
+
+    if (isDemo) {
+        return MOCK_USERS.filter(u => u.role !== 'Admin').slice(0, 2).map(u => ({
+            id: `share-${u.id}`,
+            userId: u.id,
+            email: u.email,
+            name: u.name
+        }))
+    }
 
     const adminSupabase = createServiceClient()
 
@@ -342,6 +346,12 @@ export async function removeCredentialShare(credentialId: string, userId: string
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user && !isDemo) throw new Error("Unauthorized")
+
+    if (isDemo) {
+        console.log(`Mock Remove Share: Credential ${credentialId}, User ${userId}`)
+        revalidatePath("/dashboard")
+        return { success: true }
+    }
 
     const { error } = await supabase
         .from("credential_shares")
