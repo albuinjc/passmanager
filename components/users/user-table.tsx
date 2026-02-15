@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { format } from "date-fns"
 import { Edit, Search, UserPlus } from "lucide-react"
 
@@ -34,13 +34,19 @@ interface UserTableProps {
     initialUsers: User[]
 }
 
+import { useRouter } from "next/navigation"
+
 export function UserTable({ initialUsers }: UserTableProps) {
+    const router = useRouter()
     const [users, setUsers] = useState<User[]>(initialUsers)
     const [search, setSearch] = useState("")
     const [isFormOpen, setIsFormOpen] = useState(false)
     const [editingUser, setEditingUser] = useState<User | null>(null)
 
-    
+    useEffect(() => {
+        setUsers(initialUsers)
+    }, [initialUsers])
+
     const filteredUsers = users.filter((user) =>
         user.name?.toLowerCase().includes(search.toLowerCase()) ||
         user.email.toLowerCase().includes(search.toLowerCase())
@@ -58,21 +64,19 @@ export function UserTable({ initialUsers }: UserTableProps) {
 
     const handleFormSuccess = () => {
         setIsFormOpen(false)
-        
-        
-        
+        router.refresh()
     }
 
     const handleActiveToggle = async (user: User, check: boolean) => {
-        
+
         const updatedUsers = users.map(u => u.id === user.id ? { ...u, active: check } : u)
         setUsers(updatedUsers)
 
         try {
-            const result = await updateUser(user.id, { active: check, role: user.role as any }) 
+            const result = await updateUser(user.id, { active: check, role: user.role as any })
             if (result.error) {
                 toast.error(result.error)
-                
+
                 setUsers(users)
             } else {
                 toast.success(`User ${check ? 'activated' : 'deactivated'}`)
