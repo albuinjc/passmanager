@@ -34,6 +34,9 @@ import { cn } from "@/lib/utils"
 interface ShareDialogProps {
     credentialId: string
     credentialTitle: string
+    open?: boolean
+    onOpenChange?: (open: boolean) => void
+    trigger?: React.ReactNode
 }
 
 interface UserResult {
@@ -42,8 +45,12 @@ interface UserResult {
     name?: string
 }
 
-export function ShareDialog({ credentialId, credentialTitle }: ShareDialogProps) {
-    const [open, setOpen] = useState(false)
+export function ShareDialog({ credentialId, credentialTitle, open: controlledOpen, onOpenChange: setControlledOpen, trigger }: ShareDialogProps) {
+    const [internalOpen, setInternalOpen] = useState(false)
+    const isControlled = controlledOpen !== undefined
+
+    const open = isControlled ? controlledOpen : internalOpen
+    const setOpen = isControlled ? setControlledOpen! : setInternalOpen
     const [loading, setLoading] = useState(false)
     const [openCombobox, setOpenCombobox] = useState(false)
     const [query, setQuery] = useState("")
@@ -100,10 +107,12 @@ export function ShareDialog({ credentialId, credentialTitle }: ShareDialogProps)
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8">
-                    <Share2 className="mr-2 h-3.5 w-3.5" />
-                    Share
-                </Button>
+                {trigger || (
+                    <Button variant="outline" size="sm" className="h-8">
+                        <Share2 className="mr-2 h-3.5 w-3.5" />
+                        Share
+                    </Button>
+                )}
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
