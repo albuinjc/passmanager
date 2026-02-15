@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { credentialSchema, type CredentialFormValues } from "@/lib/schemas"
-import { createCredential, updateCredential, getCredentialShares, removeCredentialShare } from "@/app/dashboard/actions"
+import { createCredential, updateCredential } from "@/app/dashboard/actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -26,7 +26,7 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { toast } from "sonner"
-import { Plus, Trash2, UserMinus } from "lucide-react"
+import { Plus } from "lucide-react"
 
 
 
@@ -44,16 +44,10 @@ interface CredentialFormProps {
     onOpenChange: (open: boolean) => void
 }
 
-interface SharedUser {
-    id: string
-    userId: string
-    email: string
-    name: string
-}
+
 
 export function CredentialForm({ credentialToEdit, open, onOpenChange }: CredentialFormProps) {
     const [loading, setLoading] = useState(false)
-    const [shares, setShares] = useState<SharedUser[]>([])
     const isEditing = !!credentialToEdit
 
     const form = useForm<CredentialFormValues>({
@@ -74,8 +68,6 @@ export function CredentialForm({ credentialToEdit, open, onOpenChange }: Credent
     useEffect(() => {
         if (credentialToEdit) {
             reset(credentialToEdit)
-            // Fetch shares
-            getCredentialShares(credentialToEdit.id).then(setShares)
         } else {
             reset({
                 title: "",
@@ -85,7 +77,6 @@ export function CredentialForm({ credentialToEdit, open, onOpenChange }: Credent
                 description: "",
                 two_fa_seed: "",
             })
-            setShares([])
         }
     }, [credentialToEdit, reset, open]) // Added open to refresh when reopening
 
@@ -122,21 +113,7 @@ export function CredentialForm({ credentialToEdit, open, onOpenChange }: Credent
         }
     }
 
-    const handleRemoveShare = async (userId: string) => {
-        if (!credentialToEdit) return
 
-        try {
-            const result = await removeCredentialShare(credentialToEdit.id, userId)
-            if (result && 'error' in result) {
-                toast.error("Failed to remove user")
-            } else {
-                toast.success("User removed from credential")
-                setShares(prev => prev.filter(s => s.userId !== userId))
-            }
-        } catch (error) {
-            toast.error("Error removing user")
-        }
-    }
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -186,31 +163,7 @@ export function CredentialForm({ credentialToEdit, open, onOpenChange }: Credent
                         {/* Using Input instead of Textarea since I don't have Textarea component yet */}
                     </div>
 
-                    {isEditing && shares.length > 0 && (
-                        <div className="space-y-2 border-t pt-4 mt-2">
-                            <h4 className="text-sm font-medium">Shared with:</h4>
-                            <div className="space-y-2">
-                                {shares.map(share => (
-                                    <div key={share.id} className="flex items-center justify-between bg-secondary/50 p-2 rounded-md text-sm">
-                                        <div className="flex flex-col">
-                                            <span className="font-medium">{share.name || "Unknown"}</span>
-                                            <span className="text-xs text-muted-foreground">{share.email}</span>
-                                        </div>
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                                            onClick={() => handleRemoveShare(share.userId)}
-                                            title="Remove access"
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                        </Button>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
+
 
                     <DialogFooter>
                         <Button type="submit" disabled={loading}>
