@@ -125,7 +125,9 @@ export async function updateCredential(id: string, formData: FormData) {
         return { success: true }
     }
 
-    const { error } = await supabase
+    const adminSupabase = createServiceClient()
+
+    const { error } = await adminSupabase
         .from("credentials")
         .update(validatedFields.data)
         .eq("id", id)
