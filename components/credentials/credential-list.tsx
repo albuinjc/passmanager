@@ -8,7 +8,7 @@ import { Plus, Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
 
 interface CredentialListProps {
-    initialCredentials: any[] 
+    initialCredentials: any[]
     currentUserRole?: string
     currentUserId?: string
 }
@@ -16,16 +16,16 @@ interface CredentialListProps {
 export function CredentialList({ initialCredentials, currentUserRole, currentUserId }: CredentialListProps) {
     const [credentials, setCredentials] = useState(initialCredentials)
     const [isModalOpen, setIsModalOpen] = useState(false)
-    const [editingCredential, setEditingCredential] = useState<any | null>(null) 
+    const [editingCredential, setEditingCredential] = useState<any | null>(null)
     const [searchQuery, setSearchQuery] = useState("")
 
-    
-    
-    
-    
-    
 
-    
+
+
+
+
+
+
     const filteredCredentials = initialCredentials.filter(c =>
         c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         c.username?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -62,7 +62,7 @@ export function CredentialList({ initialCredentials, currentUserRole, currentUse
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {filteredCredentials.map((credential) => (
-                    <div key={credential.id} className="relative">
+                    <div key={credential.id} className="relative h-full">
                         {/* We need to pass onEdit to CredentialCard if we want to trigger edit from card */}
                         {/* Currently CredentialCard has dropdown menu for edit. We need to pass a handler. */}
                         <CredentialCard

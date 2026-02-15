@@ -20,7 +20,7 @@ import { TotpViewer } from "./totp-viewer"
 import { ShareDialog } from "./share-dialog"
 
 interface CredentialCardProps {
-    credential: any 
+    credential: any
     currentUserRole?: string
     currentUserId?: string
     onEdit: (credential: any) => void
@@ -35,7 +35,7 @@ export function CredentialCard({ credential, currentUserRole, currentUserId, onE
     }
 
     const handleDelete = async () => {
-        
+
         const res = await deleteCredential(credential.id)
         if (res && 'error' in res) {
             toast.error(String(res.error))
@@ -44,7 +44,7 @@ export function CredentialCard({ credential, currentUserRole, currentUserId, onE
         }
     }
 
-    
+
     const isOwner = credential.created_by === currentUserId
     const isAdmin = currentUserRole === 'Admin'
     const isEditor = currentUserRole === 'Editor'
@@ -54,7 +54,7 @@ export function CredentialCard({ credential, currentUserRole, currentUserId, onE
     const canShare = isAdmin || isOwner || isEditor
 
     return (
-        <Card className="w-full">
+        <Card className="w-full h-full flex flex-col">
             <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
                 <div className="space-y-1">
                     <CardTitle className="text-base font-semibold truncate">{credential.title}</CardTitle>
@@ -87,7 +87,7 @@ export function CredentialCard({ credential, currentUserRole, currentUserId, onE
                     </DropdownMenuContent>
                 </DropdownMenu>
             </CardHeader>
-            <CardContent className="grid gap-4">
+            <CardContent className="grid gap-4 flex-1">
                 <div className="flex items-center space-x-2">
                     <div className="relative flex-1">
                         <Input
