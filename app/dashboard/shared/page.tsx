@@ -30,6 +30,10 @@ export default async function SharedPage() {
             .single()
         profile = profileData
 
+        if (profile?.role === 'Viewer') {
+            redirect("/dashboard")
+        }
+
 
         const { data: shares, error: fetchError } = await supabase
             .from('credential_shares')
