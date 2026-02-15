@@ -194,7 +194,6 @@ export async function searchUsers(query: string) {
         ).map(u => ({ id: u.id, email: u.email, name: u.name }))
     }
 
-    // Use service client to bypass RLS for user search
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -307,7 +306,6 @@ export async function getCredentialShares(credentialId: string) {
     if (!hasAccess && !isDemo) return []
 
     if (isDemo) {
-        // Return mock data for demo mode
         return MOCK_USERS.filter(u => u.role !== 'Admin').slice(0, 2).map(u => ({
             id: `share-${u.id}`,
             userId: u.id,
