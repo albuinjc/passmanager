@@ -146,7 +146,7 @@ export function CredentialForm({ credentialToEdit, open, onOpenChange }: Credent
                     </div>
 
                     <div className="grid gap-2">
-                        <label htmlFor="url" className="text-sm font-medium">URL</label>
+                        <label htmlFor="url" className="text-sm font-medium">URL <span className="text-red-500">*</span></label>
                         <Input id="url" {...register("url")} placeholder="https://..." />
                         {errors.url && <p className="text-sm text-red-500">{errors.url.message}</p>}
                     </div>

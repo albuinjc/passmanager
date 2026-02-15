@@ -5,7 +5,7 @@ export const credentialSchema = z.object({
     title: z.string().min(1, "Title is required"),
     username: z.string().min(1, "Username/Email is required"),
     password: z.string().min(1, "Password is required"),
-    url: z.string().url("Invalid URL").optional().or(z.literal("")),
+    url: z.string().url("Invalid URL").min(1, "URL is required"),
     description: z.string().optional(),
     two_fa_seed: z.string().toUpperCase().regex(/^[A-Z2-7]*$/, "Invalid TOTP Seed (Base32 format required: A-Z, 2-7)").min(10, "TOTP Seed must be at least 10 characters").optional().or(z.literal("")),
 })
