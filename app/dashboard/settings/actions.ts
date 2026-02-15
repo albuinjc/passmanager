@@ -114,9 +114,11 @@ export async function updateUser(id: string, data: Partial<z.infer<typeof userSc
         if (Object.keys(updates).length === 0 && !data.password) return { success: true }
 
         if (data.password) {
-            const { error: passwordError } = await serviceClient.auth.admin.updateUserById(id, {
+            console.log("Attempting to update password for user:", id)
+            const { data: updateData, error: passwordError } = await serviceClient.auth.admin.updateUserById(id, {
                 password: data.password
             })
+            console.log("Password update result:", { updateData, passwordError })
 
             if (passwordError) {
                 console.error("Error updating password:", passwordError)
