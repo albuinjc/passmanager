@@ -111,16 +111,29 @@ export async function updateUser(id: string, data: Partial<z.infer<typeof userSc
         if (data.name !== undefined) updates.name = data.name
         if (data.description !== undefined) updates.description = data.description
 
-        if (Object.keys(updates).length === 0) return { success: true }
+        if (Object.keys(updates).length === 0 && !data.password) return { success: true }
 
-        const { error } = await serviceClient
-            .from("profiles")
-            .update(updates)
-            .eq("id", id)
+        if (data.password) {
+            const { error: passwordError } = await serviceClient.auth.admin.updateUserById(id, {
+                password: data.password
+            })
 
-        if (error) {
-            console.error("Error updating user:", error)
-            return { error: error.message }
+            if (passwordError) {
+                console.error("Error updating password:", passwordError)
+                return { error: "Failed to update password: " + passwordError.message }
+            }
+        }
+
+        if (Object.keys(updates).length > 0) {
+            const { error } = await serviceClient
+                .from("profiles")
+                .update(updates)
+                .eq("id", id)
+
+            if (error) {
+                console.error("Error updating user:", error)
+                return { error: error.message }
+            }
         }
 
         revalidatePath("/dashboard/settings")
