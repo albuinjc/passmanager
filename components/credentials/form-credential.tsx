@@ -177,6 +177,7 @@ export function CredentialForm({ credentialToEdit, open, onOpenChange }: Credent
                     <div className="grid gap-2">
                         <label htmlFor="two_fa_seed" className="text-sm font-medium">TOTP Seed (Optional)</label>
                         <Input id="two_fa_seed" {...register("two_fa_seed")} placeholder="JBSWY3DPEHPK3PXP" />
+                        {errors.two_fa_seed && <p className="text-sm text-red-500">{errors.two_fa_seed.message}</p>}
                     </div>
 
                     <div className="grid gap-2">
