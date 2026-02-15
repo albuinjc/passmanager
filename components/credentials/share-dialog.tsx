@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useState } from "react"
-import { shareCredential, searchUsers } from "@/app/dashboard/actions"
+import { shareCredential, searchUsers, getCredentialShares, removeCredentialShare } from "@/app/dashboard/actions"
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/popover"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
-import { Share2, Check, X, ChevronsUpDown } from "lucide-react"
+import { Share2, Check, X, ChevronsUpDown, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface ShareDialogProps {
@@ -57,6 +57,19 @@ export function ShareDialog({ credentialId, credentialTitle, open: controlledOpe
     const [searchResults, setSearchResults] = useState<UserResult[]>([])
     const [selectedUsers, setSelectedUsers] = useState<UserResult[]>([])
 
+    const [existingShares, setExistingShares] = useState<any[]>([])
+
+    React.useEffect(() => {
+        if (open) {
+            getCredentialShares(credentialId).then(setExistingShares)
+        } else {
+            setExistingShares([])
+            setSearchResults([])
+            setSelectedUsers([])
+            setQuery("")
+        }
+    }, [open, credentialId])
+
     const handleSearch = async (value: string) => {
         setQuery(value)
         if (value.length < 2) {
@@ -64,7 +77,11 @@ export function ShareDialog({ credentialId, credentialTitle, open: controlledOpe
             return
         }
         const users = await searchUsers(value)
-        setSearchResults(users)
+
+        const filteredUsers = users.filter(user =>
+            !existingShares.some(share => share.userId === user.id)
+        )
+        setSearchResults(filteredUsers)
     }
 
     const handleSelect = (user: UserResult) => {
@@ -77,6 +94,20 @@ export function ShareDialog({ credentialId, credentialTitle, open: controlledOpe
 
     const handleRemove = (userId: string) => {
         setSelectedUsers(selectedUsers.filter(u => u.id !== userId))
+    }
+
+    const handleRemoveExistingShare = async (userId: string) => {
+        try {
+            const result = await removeCredentialShare(credentialId, userId)
+            if (result && 'error' in result) {
+                toast.error("Failed to remove user")
+            } else {
+                toast.success("User access revoked")
+                setExistingShares(prev => prev.filter(s => s.userId !== userId))
+            }
+        } catch (error) {
+            toast.error("Error removing user")
+        }
     }
 
     const onSubmit = async () => {
