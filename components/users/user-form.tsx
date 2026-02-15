@@ -43,11 +43,12 @@ type UserFormValues = z.infer<typeof userSchema>
 interface UserFormProps {
     open: boolean
     onOpenChange: (open: boolean) => void
-    userToEdit?: any | null 
+    userToEdit?: any | null
     onSuccess?: () => void
+    currentUserId?: string
 }
 
-export function UserForm({ open, onOpenChange, userToEdit, onSuccess }: UserFormProps) {
+export function UserForm({ open, onOpenChange, userToEdit, onSuccess, currentUserId }: UserFormProps) {
     const isEditing = !!userToEdit
 
     const form = useForm<UserFormValues>({
@@ -55,7 +56,7 @@ export function UserForm({ open, onOpenChange, userToEdit, onSuccess }: UserForm
         defaultValues: {
             name: userToEdit?.name || "",
             email: userToEdit?.email || "",
-            password: "", 
+            password: "",
             description: userToEdit?.description || "",
             role: userToEdit?.role || "Viewer",
             active: userToEdit?.active ?? true,
@@ -90,7 +91,7 @@ export function UserForm({ open, onOpenChange, userToEdit, onSuccess }: UserForm
         try {
             let result
             if (isEditing) {
-                
+
                 const updateData = { ...data }
                 if (!updateData.password) delete updateData.password
 
@@ -219,6 +220,7 @@ export function UserForm({ open, onOpenChange, userToEdit, onSuccess }: UserForm
                                         <Switch
                                             checked={field.value}
                                             onCheckedChange={field.onChange}
+                                            disabled={isEditing && userToEdit?.id === currentUserId}
                                         />
                                     </FormControl>
                                 </FormItem>

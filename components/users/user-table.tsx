@@ -32,11 +32,12 @@ interface User {
 
 interface UserTableProps {
     initialUsers: User[]
+    currentUserId?: string
 }
 
 import { useRouter } from "next/navigation"
 
-export function UserTable({ initialUsers }: UserTableProps) {
+export function UserTable({ initialUsers, currentUserId }: UserTableProps) {
     const router = useRouter()
     const [users, setUsers] = useState<User[]>(initialUsers)
     const [search, setSearch] = useState("")
@@ -68,6 +69,10 @@ export function UserTable({ initialUsers }: UserTableProps) {
     }
 
     const handleActiveToggle = async (user: User, check: boolean) => {
+        if (user.id === currentUserId && !check) {
+            toast.error("You cannot deactivate your own account")
+            return
+        }
 
         const updatedUsers = users.map(u => u.id === user.id ? { ...u, active: check } : u)
         setUsers(updatedUsers)
@@ -138,6 +143,7 @@ export function UserTable({ initialUsers }: UserTableProps) {
                                         <Switch
                                             checked={user.active}
                                             onCheckedChange={(checked) => handleActiveToggle(user, checked)}
+                                            disabled={user.id === currentUserId}
                                         />
                                     </TableCell>
                                     <TableCell>
@@ -161,6 +167,7 @@ export function UserTable({ initialUsers }: UserTableProps) {
                     onOpenChange={setIsFormOpen}
                     userToEdit={editingUser}
                     onSuccess={handleFormSuccess}
+                    currentUserId={currentUserId}
                 />
             )}
         </div>

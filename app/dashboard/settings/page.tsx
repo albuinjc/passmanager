@@ -11,9 +11,11 @@ import { MOCK_USERS } from "@/lib/mock-data"
 export default async function SettingsPage() {
     const isDemo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
     let users = []
+    let currentUserId: string | undefined
 
     if (isDemo) {
         users = MOCK_USERS
+        currentUserId = 'mock-user-id'
     } else {
         const supabase = await createClient()
         const { data: { user } } = await supabase.auth.getUser()
@@ -21,6 +23,8 @@ export default async function SettingsPage() {
         if (!user) {
             redirect("/login")
         }
+
+        currentUserId = user.id
 
         const { data: currentUserProfile } = await supabase
             .from("profiles")
@@ -56,7 +60,7 @@ export default async function SettingsPage() {
                         <CardDescription>Manage users, roles, and access.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <UserTable initialUsers={users} />
+                        <UserTable initialUsers={users} currentUserId={currentUserId} />
                     </CardContent>
                 </Card>
 

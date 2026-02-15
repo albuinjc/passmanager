@@ -102,6 +102,11 @@ export async function updateUser(id: string, data: Partial<z.infer<typeof userSc
         return { success: true, message: "User updated (Demo Mode)" }
     }
 
+    // Prevent self-deactivation
+    if (id === requestorId && data.active === false) {
+        return { error: "You cannot deactivate your own account" }
+    }
+
     try {
         const serviceClient = createServiceClient()
 
