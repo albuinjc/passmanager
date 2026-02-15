@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Eye, EyeOff, Copy, Trash2, Edit, Share2, MoreHorizontal } from "lucide-react"
 import { toast } from "sonner"
-import { deleteCredential } from "@/app/dashboard/actions"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -24,26 +23,16 @@ interface CredentialCardProps {
     currentUserRole?: string
     currentUserId?: string
     onEdit: (credential: any) => void
+    onDelete: (credential: any) => void
 }
 
-export function CredentialCard({ credential, currentUserRole, currentUserId, onEdit }: CredentialCardProps) {
+export function CredentialCard({ credential, currentUserRole, currentUserId, onEdit, onDelete }: CredentialCardProps) {
     const [showPassword, setShowPassword] = useState(false)
 
     const copyToClipboard = (text: string, label: string) => {
         navigator.clipboard.writeText(text)
         toast.success(`${label} copied to clipboard`)
     }
-
-    const handleDelete = async () => {
-
-        const res = await deleteCredential(credential.id)
-        if (res && 'error' in res) {
-            toast.error(String(res.error))
-        } else {
-            toast.success("Credential deleted")
-        }
-    }
-
 
     const isOwner = credential.created_by === currentUserId
     const isAdmin = currentUserRole === 'Admin'
@@ -87,7 +76,7 @@ export function CredentialCard({ credential, currentUserRole, currentUserId, onE
                             </>
                         )}
                         {canDelete && (
-                            <DropdownMenuItem className="text-red-600" onClick={handleDelete}>Delete</DropdownMenuItem>
+                            <DropdownMenuItem className="text-red-600" onClick={() => onDelete(credential)}>Delete</DropdownMenuItem>
                         )}
                     </DropdownMenuContent>
                 </DropdownMenu>

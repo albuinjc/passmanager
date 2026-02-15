@@ -15,6 +15,14 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
+import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
@@ -38,6 +46,7 @@ export function CredentialList({ initialCredentials, currentUserRole, currentUse
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [editingCredential, setEditingCredential] = useState<any | null>(null)
     const [sharingCredential, setSharingCredential] = useState<any | null>(null)
+    const [credentialToDelete, setCredentialToDelete] = useState<any | null>(null)
     const [searchQuery, setSearchQuery] = useState("")
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
     const [showPasswordMap, setShowPasswordMap] = useState<Record<string, boolean>>({})
@@ -57,13 +66,20 @@ export function CredentialList({ initialCredentials, currentUserRole, currentUse
         setIsModalOpen(true)
     }
 
-    const handleDelete = async (id: string) => {
-        const res = await deleteCredential(id)
+    const initiateDelete = (credential: any) => {
+        setCredentialToDelete(credential)
+    }
+
+    const confirmDelete = async () => {
+        if (!credentialToDelete) return
+
+        const res = await deleteCredential(credentialToDelete.id)
         if (res && 'error' in res) {
             toast.error(String(res.error))
         } else {
             toast.success("Credential deleted")
         }
+        setCredentialToDelete(null)
     }
 
     const copyToClipboard = (text: string, label: string) => {
@@ -125,6 +141,7 @@ export function CredentialList({ initialCredentials, currentUserRole, currentUse
                                 currentUserRole={currentUserRole}
                                 currentUserId={currentUserId}
                                 onEdit={handleEdit}
+                                onDelete={initiateDelete}
                             />
                         </div>
                     ))}
@@ -219,7 +236,7 @@ export function CredentialList({ initialCredentials, currentUserRole, currentUse
                                                         </>
                                                     )}
                                                     {canDelete && (
-                                                        <DropdownMenuItem className="text-red-600" onClick={() => handleDelete(credential.id)}>Delete</DropdownMenuItem>
+                                                        <DropdownMenuItem className="text-red-600" onClick={() => initiateDelete(credential)}>Delete</DropdownMenuItem>
                                                     )}
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
@@ -253,6 +270,21 @@ export function CredentialList({ initialCredentials, currentUserRole, currentUse
                     trigger={<span className="hidden"></span>} // Hidden trigger
                 />
             )}
+
+            <Dialog open={!!credentialToDelete} onOpenChange={(open) => !open && setCredentialToDelete(null)}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Delete Credential</DialogTitle>
+                        <DialogDescription>
+                            Are you sure you want to delete "{credentialToDelete?.title}"? This action cannot be undone.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button variant="ghost" onClick={() => setCredentialToDelete(null)}>Cancel</Button>
+                        <Button variant="destructive" onClick={confirmDelete}>Delete</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }
