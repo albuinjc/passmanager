@@ -349,13 +349,46 @@ export async function removeCredentialShare(credentialId: string, userId: string
 
     if (!user && !isDemo) throw new Error("Unauthorized")
 
+    const currentUserId = user?.id || MOCK_PROFILE.id
+    const role = await getUserRole(supabase, currentUserId)
+
+    if (role === "Viewer") {
+        return { error: "Viewers cannot remove shares" }
+    }
+
+    // Check permissions for Editor
+    if (role === "Editor") {
+        let isOwner = false
+        let isShared = false
+
+        if (isDemo) {
+            isOwner = MOCK_CREDENTIALS.some(c => c.id === credentialId)
+            isShared = MOCK_SHARED_CREDENTIALS.some(c => c.id === credentialId)
+        } else {
+            const { data: cred } = await supabase.from("credentials").select("created_by").eq("id", credentialId).single()
+            if (cred?.created_by === currentUserId) isOwner = true
+
+            if (!isOwner) {
+                // Check if it's shared with this user
+                const { data: share } = await supabase.from("credential_shares").select("id").eq("credential_id", credentialId).eq("shared_with", currentUserId).single()
+                if (share) isShared = true
+            }
+        }
+
+        if (!isOwner && !isShared) {
+            return { error: "You do not have permission to manage this credential" }
+        }
+    }
+
     if (isDemo) {
         console.log(`Mock Remove Share: Credential ${credentialId}, User ${userId}`)
         revalidatePath("/dashboard")
         return { success: true }
     }
 
-    const { error } = await supabase
+    const adminSupabase = createServiceClient()
+
+    const { error } = await adminSupabase
         .from("credential_shares")
         .delete()
         .eq("credential_id", credentialId)
