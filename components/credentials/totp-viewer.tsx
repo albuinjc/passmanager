@@ -20,11 +20,14 @@ export function TotpViewer({ seed }: TotpViewerProps) {
         if (!seed) return
 
         const updateToken = async () => {
+            if (!seed || seed.length < 10) {
+                setToken("ERROR")
+                return
+            }
             try {
                 const newToken = await generate({ secret: seed })
                 setToken(newToken)
             } catch (e) {
-                console.error("Invalid TOTP seed or error", e)
                 setToken("ERROR")
             }
         }
@@ -63,7 +66,7 @@ export function TotpViewer({ seed }: TotpViewerProps) {
             <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                     <span className="text-xl font-mono font-bold tracking-widest text-primary">
-                        {token.slice(0, 3)} {token.slice(3)}
+                        {token === "ERROR" ? <span className="text-sm text-destructive font-normal tracking-normal">Invalid Seed</span> : <>{token.slice(0, 3)} {token.slice(3)}</>}
                     </span>
                     <Button variant="ghost" size="icon" className="h-6 w-6" onClick={copyToken}>
                         <Copy className="h-3 w-3" />
