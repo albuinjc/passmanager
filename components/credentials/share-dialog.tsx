@@ -221,6 +221,32 @@ export function ShareDialog({ credentialId, credentialTitle, open: controlledOpe
                             </Badge>
                         ))}
                     </div>
+
+                    {existingShares.length > 0 && (
+                        <div className="space-y-2 border-t pt-4">
+                            <h4 className="text-sm font-medium">Shared with:</h4>
+                            <div className="space-y-2 max-h-[150px] overflow-y-auto pr-1">
+                                {existingShares.map(share => (
+                                    <div key={share.id} className="flex items-center justify-between bg-secondary/50 p-2 rounded-md text-sm">
+                                        <div className="flex flex-col">
+                                            <span className="font-medium">{share.name || "Unknown"}</span>
+                                            <span className="text-xs text-muted-foreground">{share.email}</span>
+                                        </div>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                            onClick={() => handleRemoveExistingShare(share.userId)}
+                                            title="Remove access"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 <DialogFooter>
