@@ -58,7 +58,12 @@ export function CredentialCard({ credential, currentUserRole, currentUserId, onE
             <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
                 <div className="space-y-1">
                     <CardTitle className="text-base font-semibold truncate">{credential.title}</CardTitle>
-                    <CardDescription className="truncate text-xs">{credential.username}</CardDescription>
+                    <div className="flex items-center gap-1 group cursor-pointer" onClick={() => copyToClipboard(credential.username, "Username")}>
+                        <CardDescription className="truncate text-xs group-hover:text-foreground transition-colors">
+                            {credential.username}
+                        </CardDescription>
+                        <Copy className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
                 </div>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
