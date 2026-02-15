@@ -272,3 +272,54 @@ export async function shareCredential(credentialId: string, emails: string[]) {
     revalidatePath("/dashboard")
     return { success: true }
 }
+
+export async function getCredentialShares(credentialId: string) {
+    const supabase = await createClient()
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user && !isDemo) return []
+
+    const { data: shares, error } = await supabase
+        .from("credential_shares")
+        .select(`
+            id,
+            profiles:shared_with (
+                id,
+                email,
+                name
+            )
+        `)
+        .eq("credential_id", credentialId)
+
+    if (error) {
+        console.error("Error fetching shares:", error)
+        return []
+    }
+
+    return shares.map((share: any) => ({
+        id: share.id, // share record id
+        userId: share.profiles.id,
+        email: share.profiles.email,
+        name: share.profiles.name
+    }))
+}
+
+export async function removeCredentialShare(credentialId: string, userId: string) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user && !isDemo) throw new Error("Unauthorized")
+
+    const { error } = await supabase
+        .from("credential_shares")
+        .delete()
+        .eq("credential_id", credentialId)
+        .eq("shared_with", userId)
+
+    if (error) {
+        return { error: error.message }
+    }
+
+    revalidatePath("/dashboard")
+    return { success: true }
+}
