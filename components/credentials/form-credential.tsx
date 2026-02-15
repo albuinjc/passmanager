@@ -52,13 +52,13 @@ export function CredentialForm({ credentialToEdit, open, onOpenChange }: Credent
 
     const form = useForm<CredentialFormValues>({
         resolver: zodResolver(credentialSchema),
-        defaultValues: credentialToEdit || {
-            title: "",
-            username: "",
-            password: "",
-            url: "",
-            description: "",
-            two_fa_seed: "",
+        defaultValues: {
+            title: credentialToEdit?.title || "",
+            username: credentialToEdit?.username || "",
+            password: credentialToEdit?.password || "",
+            url: credentialToEdit?.url || "",
+            description: credentialToEdit?.description || "",
+            two_fa_seed: credentialToEdit?.two_fa_seed || "",
         },
     })
 
@@ -67,7 +67,14 @@ export function CredentialForm({ credentialToEdit, open, onOpenChange }: Credent
 
     useEffect(() => {
         if (credentialToEdit) {
-            reset(credentialToEdit)
+            reset({
+                title: credentialToEdit.title || "",
+                username: credentialToEdit.username || "",
+                password: credentialToEdit.password || "",
+                url: credentialToEdit.url || "",
+                description: credentialToEdit.description || "",
+                two_fa_seed: credentialToEdit.two_fa_seed || "",
+            })
         } else {
             reset({
                 title: "",
@@ -83,25 +90,30 @@ export function CredentialForm({ credentialToEdit, open, onOpenChange }: Credent
 
 
     const onSubmit = async (data: CredentialFormValues) => {
-        if (data.two_fa_seed) {
-            try {
-                // Try to generate a token to validate the seed
-                const { validateTotpSeed } = await import("@/lib/totp-utils")
-                const isValid = await validateTotpSeed(data.two_fa_seed)
-
-                if (!isValid) {
-                    throw new Error("Invalid seed")
-                }
-            } catch (e) {
-                form.setError("two_fa_seed", {
-                    type: "manual",
-                    message: "Invalid TOTP Seed (must be valid Base32)"
-                })
-                return
-            }
-        }
-
         setLoading(true)
+        try {
+            if (data.two_fa_seed) {
+                try {
+                    // Try to generate a token to validate the seed
+                    const { validateTotpSeed } = await import("@/lib/totp-utils")
+                    const isValid = await validateTotpSeed(data.two_fa_seed)
+
+                    if (!isValid) {
+                        throw new Error("Invalid seed")
+                    }
+                } catch (e) {
+                    form.setError("two_fa_seed", {
+                        type: "manual",
+                        message: "Invalid TOTP Seed (must be valid Base32)"
+                    })
+                    setLoading(false)
+                    return
+                }
+            }
+        } catch (e) {
+            setLoading(false)
+            return
+        }
         try {
             const formData = new FormData()
             Object.entries(data).forEach(([key, value]) => {
@@ -176,8 +188,7 @@ export function CredentialForm({ credentialToEdit, open, onOpenChange }: Credent
 
                     <div className="grid gap-2">
                         <label htmlFor="description" className="text-sm font-medium">Description</label>
-                        <Input id="description" {...register("description")} placeholder="Notes..." />
-                        {/* Using Input instead of Textarea since I don't have Textarea component yet */}
+                        <Textarea id="description" {...register("description")} placeholder="Notes..." />
                     </div>
 
 
