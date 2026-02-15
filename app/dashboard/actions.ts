@@ -31,12 +31,12 @@ export async function createCredential(formData: FormData) {
     }
 
     const rawData = {
-        title: formData.get("title"),
-        username: formData.get("username"),
-        password: formData.get("password"),
-        url: formData.get("url"),
-        description: formData.get("description"),
-        two_fa_seed: formData.get("two_fa_seed"),
+        title: formData.get("title") as string,
+        username: formData.get("username") as string,
+        password: formData.get("password") as string,
+        url: (formData.get("url") as string) || undefined,
+        description: (formData.get("description") as string) || undefined,
+        two_fa_seed: (formData.get("two_fa_seed") as string) || undefined,
     }
 
     const validatedFields = credentialSchema.safeParse(rawData)
@@ -75,14 +75,14 @@ export async function updateCredential(id: string, formData: FormData) {
     const userId = user?.id || MOCK_PROFILE.id
     const role = await getUserRole(supabase, userId)
 
-    
+
     if (role === "Viewer") {
         return { error: "Viewers cannot edit credentials" }
     }
 
-    
+
     if (role === "Editor") {
-        
+
         let isOwner = false
         let isShared = false
 
@@ -105,12 +105,12 @@ export async function updateCredential(id: string, formData: FormData) {
     }
 
     const rawData = {
-        title: formData.get("title"),
-        username: formData.get("username"),
-        password: formData.get("password"),
-        url: formData.get("url"),
-        description: formData.get("description"),
-        two_fa_seed: formData.get("two_fa_seed"),
+        title: formData.get("title") as string,
+        username: formData.get("username") as string,
+        password: formData.get("password") as string,
+        url: (formData.get("url") as string) || undefined,
+        description: (formData.get("description") as string) || undefined,
+        two_fa_seed: (formData.get("two_fa_seed") as string) || undefined,
     }
 
     const validatedFields = credentialSchema.safeParse(rawData)
@@ -152,7 +152,7 @@ export async function deleteCredential(id: string) {
     }
 
     if (role === "Editor") {
-        
+
         let isOwner = false
         if (isDemo) {
             isOwner = MOCK_CREDENTIALS.some(c => c.id === id)
@@ -198,9 +198,9 @@ export async function searchUsers(query: string) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return []
 
-    
-    
-    
+
+
+
 
     const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single()
     if (profile?.role === "Viewer") return []
@@ -211,7 +211,7 @@ export async function searchUsers(query: string) {
         .from("profiles")
         .select("id, email, name")
         .ilike("email", `%${query}%`)
-        .neq("id", user.id) 
+        .neq("id", user.id)
         .limit(5)
 
     if (error) {
@@ -243,7 +243,7 @@ export async function shareCredential(credentialId: string, emails: string[]) {
 
     if (!emails || emails.length === 0) return { error: "No users selected" }
 
-    
+
     const { data: profiles, error: profileError } = await supabase
         .from("profiles")
         .select("id, email")
@@ -253,7 +253,7 @@ export async function shareCredential(credentialId: string, emails: string[]) {
         return { error: "Users not found" }
     }
 
-    
+
     const inserts = profiles.map(profile => ({
         credential_id: credentialId,
         shared_with: profile.id,

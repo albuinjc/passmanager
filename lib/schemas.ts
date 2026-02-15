@@ -3,7 +3,7 @@ import { z } from "zod"
 
 export const credentialSchema = z.object({
     title: z.string().min(1, "Title is required"),
-    username: z.string().optional(),
+    username: z.string().min(1, "Username/Email is required"),
     password: z.string().min(1, "Password is required"),
     url: z.string().url("Invalid URL").optional().or(z.literal("")),
     description: z.string().optional(),

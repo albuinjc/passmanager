@@ -7,7 +7,7 @@ import { credentialSchema, type CredentialFormValues } from "@/lib/schemas"
 import { createCredential, updateCredential } from "@/app/dashboard/actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea" 
+import { Textarea } from "@/components/ui/textarea"
 import {
     Dialog,
     DialogContent,
@@ -24,7 +24,7 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from "@/components/ui/form" 
+} from "@/components/ui/form"
 import { toast } from "sonner"
 import { Plus } from "lucide-react"
 
@@ -39,7 +39,7 @@ import { Plus } from "lucide-react"
 
 
 interface CredentialFormProps {
-    credentialToEdit?: any 
+    credentialToEdit?: any
     open: boolean
     onOpenChange: (open: boolean) => void
 }
@@ -62,7 +62,7 @@ export function CredentialForm({ credentialToEdit, open, onOpenChange }: Credent
 
     const { register, handleSubmit, formState: { errors }, reset } = form
 
-    
+
     useEffect(() => {
         if (credentialToEdit) {
             reset(credentialToEdit)
@@ -95,8 +95,8 @@ export function CredentialForm({ credentialToEdit, open, onOpenChange }: Credent
                 result = await createCredential(formData)
             }
 
-            if (result && 'error' in result) { 
-                
+            if (result && 'error' in result) {
+
                 toast.error("Error saving credential")
                 console.error(result.error)
             } else {
@@ -122,18 +122,19 @@ export function CredentialForm({ credentialToEdit, open, onOpenChange }: Credent
                 </DialogHeader>
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <div className="grid gap-2">
-                        <label htmlFor="title" className="text-sm font-medium">Title</label>
+                        <label htmlFor="title" className="text-sm font-medium">Title <span className="text-red-500">*</span></label>
                         <Input id="title" {...register("title")} placeholder="e.g. Google Work" />
                         {errors.title && <p className="text-sm text-red-500">{errors.title.message}</p>}
                     </div>
 
                     <div className="grid gap-2">
-                        <label htmlFor="username" className="text-sm font-medium">Username/Email</label>
+                        <label htmlFor="username" className="text-sm font-medium">Username/Email <span className="text-red-500">*</span></label>
                         <Input id="username" {...register("username")} placeholder="user@company.com" />
+                        {errors.username && <p className="text-sm text-red-500">{errors.username.message}</p>}
                     </div>
 
                     <div className="grid gap-2">
-                        <label htmlFor="password" className="text-sm font-medium">Password</label>
+                        <label htmlFor="password" className="text-sm font-medium">Password <span className="text-red-500">*</span></label>
                         <div className="relative">
                             <Input id="password" type="password" {...register("password")} placeholder="********" />
                         </div>

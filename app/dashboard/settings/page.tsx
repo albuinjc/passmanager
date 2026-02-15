@@ -22,8 +22,18 @@ export default async function SettingsPage() {
             redirect("/login")
         }
 
-        
-        
+        const { data: currentUserProfile } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", user.id)
+            .single()
+
+        if (currentUserProfile?.role !== "Admin") {
+            redirect("/dashboard")
+        }
+
+
+
         const { data: profiles, error } = await supabase
             .from("profiles")
             .select("*")
