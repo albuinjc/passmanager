@@ -273,13 +273,46 @@ export async function shareCredential(credentialId: string, emails: string[]) {
     return { success: true }
 }
 
+import { createServiceClient } from "@/lib/supabase-admin"
+
 export async function getCredentialShares(credentialId: string) {
     const supabase = await createClient()
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user && !isDemo) return []
 
-    const { data: shares, error } = await supabase
+    const role = await getUserRole(supabase, user!.id)
+
+    let hasAccess = false
+
+    if (role === 'Admin') {
+        hasAccess = true
+    } else {
+        const { data: credential } = await supabase
+            .from("credentials")
+            .select("created_by")
+            .eq("id", credentialId)
+            .single()
+
+        if (credential?.created_by === user!.id) {
+            hasAccess = true
+        } else {
+            const { data: myShare } = await supabase
+                .from("credential_shares")
+                .select("id")
+                .eq("credential_id", credentialId)
+                .eq("shared_with", user!.id)
+                .single()
+
+            if (myShare) hasAccess = true
+        }
+    }
+
+    if (!hasAccess && !isDemo) return []
+
+    const adminSupabase = createServiceClient()
+
+    const { data: shares, error } = await adminSupabase
         .from("credential_shares")
         .select(`
             id,
