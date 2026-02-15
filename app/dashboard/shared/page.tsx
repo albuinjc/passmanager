@@ -31,9 +31,6 @@ export default async function SharedPage() {
         profile = profileData
 
 
-
-
-
         const { data: shares, error: fetchError } = await supabase
             .from('credential_shares')
             .select(`
@@ -42,21 +39,26 @@ export default async function SharedPage() {
             .eq('user_email', user.email)
 
 
+        if (profile?.role === 'Admin') {
+            const { data: creds, error: credError } = await supabase
+                .from("credentials")
+                .select("*")
+                .neq("created_by", user.id)
+                .order("created_at", { ascending: false })
 
+            credentials = creds
+            error = credError
+        } else {
+            // Editor / Viewer - show explicitly shared credentials
+            const { data: creds, error: credError } = await supabase
+                .from("credentials")
+                .select("*, credential_shares!inner(shared_with)")
+                .eq("credential_shares.shared_with", user.id)
+                .order("created_at", { ascending: false })
 
-
-
-
-
-
-
-        const { data: creds, error: credError } = await supabase
-            .from("credentials")
-            .select("*, credential_shares!inner(shared_with)")
-            .eq("credential_shares.shared_with", user.id)
-
-        credentials = creds
-        error = credError
+            credentials = creds
+            error = credError
+        }
     }
 
     if (error) {

@@ -14,15 +14,15 @@ export default async function CredentialsPage() {
         user = MOCK_USER
         profile = MOCK_PROFILE
 
-        
+
         if (profile.role === 'Admin') {
             credentials = [...MOCK_CREDENTIALS, ...MOCK_SHARED_CREDENTIALS]
         } else if (profile.role === 'Editor') {
-            
-            
+
+
             credentials = [...MOCK_CREDENTIALS, ...MOCK_SHARED_CREDENTIALS]
         } else {
-            
+
             credentials = MOCK_SHARED_CREDENTIALS
         }
     } else {
@@ -44,27 +44,10 @@ export default async function CredentialsPage() {
         let query = supabase
             .from("credentials")
             .select("*, credential_shares(shared_with)")
+            .eq("created_by", user.id)
             .order("created_at", { ascending: false })
 
-        if (profile?.role === 'Admin') {
-            
-            
-        } else {
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-        }
+
 
         const { data: creds, error: fetchError } = await query
 

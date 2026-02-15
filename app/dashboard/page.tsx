@@ -7,18 +7,17 @@ export default async function DashboardPage() {
     const isDemo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
 
     let user, profile, credentials
-    let error = null 
+    let error = null
 
     if (isDemo) {
         user = MOCK_USER
         profile = MOCK_PROFILE
-        
+
         if (profile.role === 'Admin') {
             credentials = [...MOCK_CREDENTIALS, ...MOCK_SHARED_CREDENTIALS]
         } else if (profile.role === 'Editor') {
             credentials = [...MOCK_CREDENTIALS, ...MOCK_SHARED_CREDENTIALS]
         } else {
-            
             credentials = MOCK_SHARED_CREDENTIALS
         }
     } else {
@@ -30,7 +29,6 @@ export default async function DashboardPage() {
             redirect("/login")
         }
 
-        
         const { data: profileData } = await supabase
             .from("profiles")
             .select("role")
@@ -38,21 +36,18 @@ export default async function DashboardPage() {
             .single()
         profile = profileData
 
-        
-        
-        
         const { data: creds, error: fetchError } = await supabase
             .from("credentials")
             .select("*")
             .order("created_at", { ascending: false })
 
         credentials = creds
-        error = fetchError 
+        error = fetchError
     }
 
     if (error) {
         console.error("Error fetching credentials:", error)
-        
+
     }
 
     return (
