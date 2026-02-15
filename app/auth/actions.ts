@@ -19,6 +19,21 @@ export async function login(formData: FormData) {
         return { error: error.message }
     }
 
+    // Check if user is active
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+        const { data: profile } = await supabase
+            .from("profiles")
+            .select("active")
+            .eq("id", user.id)
+            .single()
+
+        if (profile && profile.active === false) {
+            await supabase.auth.signOut()
+            return { error: "Your account has been deactivated. Please contact an administrator." }
+        }
+    }
+
     revalidatePath("/", "layout")
     redirect("/dashboard")
 }
@@ -38,10 +53,10 @@ export async function signup(formData: FormData) {
         return { error: error.message }
     }
 
-    
-    
-    
-    
+
+
+
+
 
     return { success: true, message: "Check your email to confirm your account" }
 }

@@ -86,7 +86,6 @@ export async function createUser(data: z.infer<typeof userSchema>) {
 }
 
 export async function updateUser(id: string, data: Partial<z.infer<typeof userSchema>>) {
-    console.log("updateUser called with:", { id, dataKeys: Object.keys(data), hasPassword: !!data.password })
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -115,11 +114,9 @@ export async function updateUser(id: string, data: Partial<z.infer<typeof userSc
         if (Object.keys(updates).length === 0 && !data.password) return { success: true }
 
         if (data.password) {
-            console.log("Attempting to update password for user:", id)
-            const { data: updateData, error: passwordError } = await serviceClient.auth.admin.updateUserById(id, {
+            const { error: passwordError } = await serviceClient.auth.admin.updateUserById(id, {
                 password: data.password
             })
-            console.log("Password update result:", { updateData, passwordError })
 
             if (passwordError) {
                 console.error("Error updating password:", passwordError)
