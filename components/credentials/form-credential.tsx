@@ -28,23 +28,11 @@ import {
 import { toast } from "sonner"
 import { Plus } from "lucide-react"
 
-
-
-
-
-
-
-
-
-
-
 interface CredentialFormProps {
     credentialToEdit?: any
     open: boolean
     onOpenChange: (open: boolean) => void
 }
-
-
 
 export function CredentialForm({ credentialToEdit, open, onOpenChange }: CredentialFormProps) {
     const [loading, setLoading] = useState(false)
@@ -86,8 +74,6 @@ export function CredentialForm({ credentialToEdit, open, onOpenChange }: Credent
             })
         }
     }, [credentialToEdit, reset, open]) // Added open to refresh when reopening
-
-
 
     const onSubmit = async (data: CredentialFormValues) => {
         setLoading(true)
@@ -143,7 +129,6 @@ export function CredentialForm({ credentialToEdit, open, onOpenChange }: Credent
     }
 
 
-
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
@@ -190,8 +175,6 @@ export function CredentialForm({ credentialToEdit, open, onOpenChange }: Credent
                         <label htmlFor="description" className="text-sm font-medium">Description</label>
                         <Textarea id="description" {...register("description")} placeholder="Notes..." />
                     </div>
-
-
 
                     <DialogFooter>
                         <Button type="submit" disabled={loading}>

@@ -41,7 +41,6 @@ export function TotpViewer({ seed }: TotpViewerProps) {
             setTimeLeft(remaining)
             setProgress((remaining / definedStep) * 100)
 
-
             if (remaining === definedStep) {
                 updateToken()
             }

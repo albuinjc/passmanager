@@ -53,11 +53,6 @@ export async function signup(formData: FormData) {
         return { error: error.message }
     }
 
-
-
-
-
-
     return { success: true, message: "Check your email to confirm your account" }
 }
 
