@@ -1,4 +1,5 @@
 import { Sidebar } from "@/components/ui/sidebar"
+import { MobileNav } from "@/components/ui/mobile-nav"
 import { createClient } from "@/lib/supabase-server"
 import { MOCK_PROFILE } from "@/lib/mock-data"
 import { redirect } from "next/navigation"
@@ -45,8 +46,14 @@ export default async function DashboardLayout({
 
             {/* Main Content */}
             <div className="flex-1 md:pl-64 flex flex-col">
-                {/* Top bar could go here */}
-                <header className="h-16 border-b flex items-center justify-between px-6 bg-background sticky top-0 z-40">
+                {/* Mobile Header */}
+                <div className="md:hidden flex items-center p-4 border-b bg-background sticky top-0 z-40">
+                    <MobileNav userRole={userRole} userName={userName} userEmail={userEmail} />
+                    <span className="ml-2 font-bold text-lg">SecurePass</span>
+                </div>
+
+                {/* Desktop Header (hidden on mobile) */}
+                <header className="hidden md:flex h-16 border-b items-center justify-between px-6 bg-background sticky top-0 z-40">
                     <div className="flex items-center gap-4 w-full justify-end">
                         <div className="flex items-center gap-2">
                             {/* Header content removed as per request */}

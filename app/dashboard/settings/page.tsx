@@ -63,8 +63,6 @@ export default async function SettingsPage() {
                         <UserTable initialUsers={users} currentUserId={currentUserId} />
                     </CardContent>
                 </Card>
-
-                {/* Profile and Appearance sections removed */}
             </div>
         </div>
     )
