@@ -249,46 +249,13 @@ export async function shareCredential(credentialId: string, emails: string[]) {
         return { error: "Users not found" }
     }
 
-    // Check permission: Owner or already Shared With
-    let hasPermission = false
-
-    if (role === 'Admin') {
-        hasPermission = true
-    } else {
-        // Check if owner
-        const { data: cred } = await supabase
-            .from("credentials")
-            .select("created_by")
-            .eq("id", credentialId)
-            .single()
-
-        if (cred?.created_by === userId) {
-            hasPermission = true
-        } else {
-            // Check if shared with me
-            const { data: share } = await supabase
-                .from("credential_shares")
-                .select("id")
-                .eq("credential_id", credentialId)
-                .eq("shared_with", userId)
-                .single()
-
-            if (share) hasPermission = true
-        }
-    }
-
-    if (!hasPermission) {
-        return { error: "You do not have permission to share this credential" }
-    }
-
     const inserts = profiles.map(profile => ({
         credential_id: credentialId,
         shared_with: profile.id,
         shared_by: user!.id
     }))
 
-    // Use admin client to bypass RLS "insert own credential only" policy
-    const { error } = await adminSupabase
+    const { error } = await supabase
         .from("credential_shares")
         .insert(inserts)
 
