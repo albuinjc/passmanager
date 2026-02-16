@@ -34,15 +34,6 @@ export default async function SharedPage() {
             redirect("/dashboard")
         }
 
-
-        const { data: shares, error: fetchError } = await supabase
-            .from('credential_shares')
-            .select(`
-                 credential:credentials (*)
-             `)
-            .eq('user_email', user.email)
-
-
         if (profile?.role === 'Admin') {
             const { data: creds, error: credError } = await supabase
                 .from("credentials")

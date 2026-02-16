@@ -15,18 +15,9 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@/components/ui/dialog"
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form"
 import { toast } from "sonner"
-import { Plus } from "lucide-react"
+
 
 interface CredentialFormProps {
     credentialToEdit?: any
@@ -87,7 +78,8 @@ export function CredentialForm({ credentialToEdit, open, onOpenChange }: Credent
                     if (!isValid) {
                         throw new Error("Invalid seed")
                     }
-                } catch (e) {
+                } catch (error) {
+                    console.error(error)
                     form.setError("two_fa_seed", {
                         type: "manual",
                         message: "Invalid TOTP Seed (must be valid Base32)"
@@ -96,7 +88,8 @@ export function CredentialForm({ credentialToEdit, open, onOpenChange }: Credent
                     return
                 }
             }
-        } catch (e) {
+        } catch (error) {
+            console.error(error)
             setLoading(false)
             return
         }
@@ -122,6 +115,7 @@ export function CredentialForm({ credentialToEdit, open, onOpenChange }: Credent
                 reset()
             }
         } catch (error) {
+            console.error(error)
             toast.error("Something went wrong")
         } finally {
             setLoading(false)
