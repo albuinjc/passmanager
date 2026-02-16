@@ -19,7 +19,7 @@ interface MobileNavProps {
     userEmail?: string
 }
 
-export function MobileNav({ userRole, userName, userEmail }: MobileNavProps) {
+export default function MobileNav({ userRole, userName, userEmail }: MobileNavProps) {
     const [open, setOpen] = useState(false)
     const pathname = usePathname()
 
