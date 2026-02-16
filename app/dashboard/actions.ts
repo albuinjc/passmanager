@@ -125,9 +125,7 @@ export async function updateCredential(id: string, formData: FormData) {
         return { success: true }
     }
 
-    const adminSupabase = createServiceClient()
-
-    const { error } = await adminSupabase
+    const { error } = await supabase
         .from("credentials")
         .update(validatedFields.data)
         .eq("id", id)
@@ -385,9 +383,7 @@ export async function removeCredentialShare(credentialId: string, userId: string
         return { success: true }
     }
 
-    const adminSupabase = createServiceClient()
-
-    const { error } = await adminSupabase
+    const { error } = await supabase
         .from("credential_shares")
         .delete()
         .eq("credential_id", credentialId)
