@@ -1,5 +1,5 @@
 import { Sidebar } from "@/components/ui/sidebar"
-import { MobileNav } from "@/components/ui/mobile-nav"
+import MobileNav from "@/components/ui/mobile-nav"
 import { createClient } from "@/lib/supabase-server"
 import { MOCK_PROFILE } from "@/lib/mock-data"
 import { redirect } from "next/navigation"
