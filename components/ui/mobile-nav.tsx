@@ -40,7 +40,7 @@ export function MobileNav({ userRole, userName, userEmail }: MobileNavProps) {
                 <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                 <SheetDescription className="sr-only">Main navigation sidebar</SheetDescription>
                 <Sidebar
-                    className="border-none w-full pb-20"
+                    className="border-none w-full pb-32"
                     userRole={userRole}
                     userName={userName}
                     userEmail={userEmail}

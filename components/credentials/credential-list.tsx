@@ -42,7 +42,6 @@ interface CredentialListProps {
 }
 
 export function CredentialList({ initialCredentials, currentUserRole, currentUserId }: CredentialListProps) {
-    const [credentials, setCredentials] = useState(initialCredentials)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [editingCredential, setEditingCredential] = useState<any | null>(null)
     const [sharingCredential, setSharingCredential] = useState<any | null>(null)

@@ -4,7 +4,6 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import {
     LayoutDashboard,
     Key,
@@ -12,8 +11,6 @@ import {
     Settings,
     HelpCircle,
     LogOut,
-    CreditCard,
-    FileText,
     ShieldCheck
 } from "lucide-react"
 
@@ -69,13 +66,6 @@ export function Sidebar({ className, userRole, userName, userEmail }: SidebarPro
         },
     ]
 
-    const handleSignOut = async () => {
-        try {
-            await fetch("/auth/signout", { method: "POST" })
-        } catch (error) {
-            console.error("Error signing out:", error)
-        }
-    }
 
     return (
         <div className={cn("pb-12 h-screen border-r bg-background", className)}>
