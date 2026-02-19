@@ -96,6 +96,7 @@ export function CredentialCard({ credential, currentUserRole, currentUserId, onE
                                 size="icon"
                                 className="h-8 w-8 text-muted-foreground hover:text-foreground"
                                 onClick={() => setShowPassword(!showPassword)}
+                                data-testid="toggle-password"
                             >
                                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </Button>
