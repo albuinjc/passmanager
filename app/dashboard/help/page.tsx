@@ -26,6 +26,36 @@ export default function HelpPage() {
                             No, secure sharing is restricted to registered users within the organization domain.
                         </AccordionContent>
                     </AccordionItem>
+                    <AccordionItem value="item-4">
+                        <AccordionTrigger>What are the different user roles?</AccordionTrigger>
+                        <AccordionContent>
+                            The system has three roles: Administrator (full control and user management), Editor (can create credentials and edit shared ones), and Viewer (read-only access to credentials shared with them).
+                        </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-5">
+                        <AccordionTrigger>Why can&apos;t I edit or delete some credentials?</AccordionTrigger>
+                        <AccordionContent>
+                            If you are a &apos;Viewer&apos;, you only have read permissions. If you are an &apos;Editor&apos;, you can create credentials and edit those shared with you, but you can only delete credentials you created yourself.
+                        </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-6">
+                        <AccordionTrigger>What happens if my account is deactivated?</AccordionTrigger>
+                        <AccordionContent>
+                            You will immediately lose access to the system. For security reasons, if you have an active session, the system will automatically log you out.
+                        </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-7">
+                        <AccordionTrigger>How do I quickly copy credential data?</AccordionTrigger>
+                        <AccordionContent>
+                            By clicking the &quot;Copy&quot; buttons (clipboard icon) embedded directly on each credential card.
+                        </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-8">
+                        <AccordionTrigger>Can I delete a credential shared with me?</AccordionTrigger>
+                        <AccordionContent>
+                            No, only the original creator of the credential or a system Administrator can permanently delete it.
+                        </AccordionContent>
+                    </AccordionItem>
                 </Accordion>
             </div>
         </div>
