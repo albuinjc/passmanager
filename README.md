@@ -1,6 +1,6 @@
 # SecurePass Corp - Gestor de Credenciales Corporativo
 
-## 1. Descripción General del Proyecto
+## 1. Descripción general del proyecto
 
 **SecurePass Corp** es una aplicación web moderna y segura diseñada para la gestión centralizada de credenciales corporativas. Su objetivo principal es permitir a las organizaciones almacenar, compartir y gestionar el acceso a contraseñas y claves de manera segura y eficiente.
 
@@ -12,7 +12,7 @@ Está alojado en Vercel y se puede acceder a través del siguiente enlace:
 
 > Las credenciales de acceso están en el documento de la presentación.
 
-## 2. Stack Tecnológico Utilizado
+## 2. Stack tecnológico
 
 El proyecto ha sido desarrollado utilizando las tecnologías más recientes y robustas del ecosistema React/Next.js:
 
@@ -36,7 +36,7 @@ El proyecto ha sido desarrollado utilizando las tecnologías más recientes y ro
 - **Alojamiento**:
   - [Vercel](https://vercel.com/): Plataforma de alojamiento y despliegue de aplicaciones web.
 
-## 3. Información sobre su Instalación y Ejecución
+## 3. Información sobre su instalación y ejecución
 
 Siga estos pasos para ejecutar el proyecto en su entorno local:
 
@@ -50,8 +50,8 @@ Siga estos pasos para ejecutar el proyecto en su entorno local:
 1.  **Clonar el repositorio**:
 
     ```bash
-    git clone <url-del-repositorio>
-    cd passmanagerrepo
+    git clone https://github.com/albuinjc/passmanager.git
+    cd passmanager
     ```
 
 2.  **Instalar dependencias**:
@@ -92,7 +92,7 @@ Siga estos pasos para ejecutar el proyecto en su entorno local:
     npm run test
     ```
 
-## 4. Estructura del Proyecto
+## 4. Estructura del proyecto
 
 La estructura de carpetas sigue las convenciones del App Router de Next.js:
 
@@ -119,7 +119,7 @@ La estructura de carpetas sigue las convenciones del App Router de Next.js:
   - `unit/`: Tests unitarios de componentes, esquemas y lógica de negocio.
 - `supabase_setup.sql`: Configuración de la base de datos.
 
-## 5. Funcionalidades Principales
+## 5. Funcionalidades principales
 
 ### 🔐 Autenticación y Seguridad
 
