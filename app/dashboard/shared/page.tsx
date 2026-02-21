@@ -70,6 +70,7 @@ export default async function SharedPage() {
                 initialCredentials={credentials || []}
                 currentUserRole={profile?.role}
                 currentUserId={user.id}
+                hideAddButton={true}
             />
         </div>
     )
