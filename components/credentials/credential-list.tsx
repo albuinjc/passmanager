@@ -39,9 +39,10 @@ interface CredentialListProps {
     initialCredentials: any[]
     currentUserRole?: string
     currentUserId?: string
+    hideAddButton?: boolean
 }
 
-export function CredentialList({ initialCredentials, currentUserRole, currentUserId }: CredentialListProps) {
+export function CredentialList({ initialCredentials, currentUserRole, currentUserId, hideAddButton = false }: CredentialListProps) {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [editingCredential, setEditingCredential] = useState<any | null>(null)
     const [sharingCredential, setSharingCredential] = useState<any | null>(null)
@@ -123,7 +124,7 @@ export function CredentialList({ initialCredentials, currentUserRole, currentUse
                             <List className="h-4 w-4" />
                         </Button>
                     </div>
-                    {currentUserRole !== 'Viewer' && (
+                    {currentUserRole !== 'Viewer' && !hideAddButton && (
                         <Button onClick={handleCreate}>
                             <Plus className="mr-2 h-4 w-4" /> Add Credential
                         </Button>
